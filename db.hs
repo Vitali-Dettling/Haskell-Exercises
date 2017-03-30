@@ -56,7 +56,7 @@ allLast l = map (\x -> get3(x)) l
 
 -- Return false if one of the students name is the same, even if the others are different. (and)
 difElem (x:xs) = (map (/= x) (xs))
-sameElem (x:xs) = (map (== x) (xs))
+-- sameElem (x:xs) = (map (== x) (xs))
 
 -- EXTENSION TO TASK 0
 {-
@@ -72,7 +72,7 @@ cons3 = [("Jane", 111, [141]), ("Jack", 112, [141, 252])]
   
 valid :: DB -> Bool
 valid [] = True
-valid db = or (map and [sameElem x | x <- allLast cons3]) 
+valid db = or (myFlatt [difElem x | x <- allLast db]) 
            && and (difElem (allFirst (db))) 
            && or (difElem (allSecond (db)))
 
@@ -83,8 +83,8 @@ valid db = or (map and [sameElem x | x <- allLast cons3])
 Given a database and a student id, we're looking for the list of 
 courses of this particular student.
 -}
-query1 :: DB -> Int -> [Int]
-query1 = error "Your code"
+-- query1 :: DB -> Int -> [Int]
+-- query1 db id = c where c = flatten ([get3 x | x <- db, get2 x == id])
 
 
 -- TASK 2
@@ -140,3 +140,9 @@ student IDs.
 
 merge :: DB -> DB -> Maybe DB
 merge = error "Your code"
+
+
+-- Utils
+myFlatt :: [[a]] -> [a]
+myFlatt [] = []
+myFlatt (xs:xss) = xs ++ (myFlatt xss)
