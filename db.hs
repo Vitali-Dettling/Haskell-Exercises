@@ -6,16 +6,11 @@
 -- Author: Martin Sulzmann
 -------------------------------------------------------
 
-
-
 -- A student is represented by her name, student id and 
 -- a list of the courses the student is taking
 
-
 type Student = (String, Int, [Int])
 type DB = [Student]
-
-
 
 -- TASK 0
 {-
@@ -33,7 +28,7 @@ incons2 = [("Jane", 112, [141, 252]), ("Jane", 112, [141, 252])]
 incons22 :: DB
 incons22 = [("Jane", 112, [141, 252]), ("Jane", 112, [141, 252]), ("Tim", 112, [141, 252])]
 cons1 :: DB
-cons1 = [("Jane", 112, [141, 252]), ("Tim", 112, [141, 252]), ("Paul", 112, [141, 252])]
+cons1 = [("Jane", 122, [141, 252]), ("Tim", 212, [141, 252]), ("Paul", 112, [141, 252])]
 
 {-
 Your task is to implement the following function
@@ -48,21 +43,20 @@ http://stackoverflow.com/questions/940382/haskell-difference-between-dot-and-dol
 -}
 
 -- Gets the first elem from tuble
-get1 (a,_,_) = a
--- Gets the first elem from tuble
+get1 (f,_,_) = f
+-- Gets the second elem from tuble
+get2 (_,m,_) = m
+-- Gets the last elem from tuble
 get3 (_,_,l) = l
 
--- Gets the first elem from a list
+-- Gets all elems from a particular position from a list
 allFirst l = map (\x -> get1(x)) l 
+allSecond l = map (\x -> get2(x)) l
 allLast l = map (\x -> get3(x)) l
 
 -- Return false if one of the students name is the same, even if the others are different. (and)
 difElem (x:xs) = (map (/= x) (xs))
-sameNum (x:xs) = (map (== x) (xs))
-
-valid :: DB -> Bool
-valid [] = True
-valid db = and (difElem (allFirst (db))) && or (sameNum (allLast (db)))
+sameElem (x:xs) = (map (== x) (xs))
 
 -- EXTENSION TO TASK 0
 {-
@@ -70,12 +64,19 @@ Extension: We strenghten the notion of consistency.
 In addition, we require that there shall by no duplicate student id's.
 For example, 
 -}
-                  
+incons3 :: DB                
 incons3 = [("Jane", 111, [141]), ("Jack", 111, [141, 252])]
+
+cons3 :: DB                
+cons3 = [("Jane", 111, [141]), ("Jack", 112, [141, 252])]
   
+valid :: DB -> Bool
+valid [] = True
+valid db = or (map and [sameElem x | x <- allLast cons3]) 
+           && and (difElem (allFirst (db))) 
+           && or (difElem (allSecond (db)))
 
 -- FROM HERE ON, WE WILL ASSUME THAT ALL DATABASES ARE CONSISTENT !!!
-
 
 -- TASK 1
 {-
