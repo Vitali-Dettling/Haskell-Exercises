@@ -83,9 +83,8 @@ valid db = or (myFlatt [difElem x | x <- allLast db])
 Given a database and a student id, we're looking for the list of 
 courses of this particular student.
 -}
--- query1 :: DB -> Int -> [Int]
--- query1 db id = c where c = flatten ([get3 x | x <- db, get2 x == id])
-
+query1 :: DB -> Int -> [Int]
+query1 db id = c where c = myFlatt ([get3 x | x <- db, get2 x == id])
 
 -- TASK 2
 {-
@@ -93,9 +92,7 @@ Given a database and a course, find all students
 taking this course.
 -}
 query2 :: DB -> Int -> [String]
-query2 = error "Your code"
-
-
+query2 db c = s where s = [get1 x | x <- db, cs <- get3 x, cs == c]
 
 -- TASK 3
 {-
@@ -103,7 +100,12 @@ Given a database, sort the database (in non-decreasing order)
 according to the name of students.
 -}
 sortDB :: DB -> DB
-sortDB = error "Your code"
+sortDB [] = []
+sortDB gtThan (p:xs) = (quicksort gtThan lesser) ++ [p] ++ (quicksort gtThan greater)
+    where
+        ltEqThan = \x -> \y -> not (gtThan x y)
+        lesser = filter (gtThan p) xs
+        greater = filter (ltEqThan p) xs
 
 {-
 Extension1:
@@ -140,6 +142,7 @@ student IDs.
 
 merge :: DB -> DB -> Maybe DB
 merge = error "Your code"
+
 
 
 -- Utils
