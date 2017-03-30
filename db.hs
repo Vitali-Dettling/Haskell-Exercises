@@ -1,5 +1,3 @@
-
-
 -------------------------------------------------------
 -- Extended Haskell programming exercise
 -- Topic: functions over lists
@@ -42,21 +40,26 @@ dot(.) vs dollar($)
 http://stackoverflow.com/questions/940382/haskell-difference-between-dot-and-dollar-sign 
 -}
 
--- Gets the first elem from tuble
-get1 (f,_,_) = f
--- Gets the second elem from tuble
+-- Gets the first elemement
+get1 :: Student -> [Char]
+get1 (s,_,_) = s
+-- Gets the second elemement
+get2 :: Student -> Int
 get2 (_,m,_) = m
--- Gets the last elem from tuble
-get3 (_,_,l) = l
+-- Gets the last elemement
+get3 :: Student -> [Int]
+get3 (_,_,cs) = cs
 
 -- Gets all elems from a particular position from a list
-allFirst l = map (\x -> get1(x)) l 
-allSecond l = map (\x -> get2(x)) l
-allLast l = map (\x -> get3(x)) l
+allFirst :: DB -> [String]
+allFirst l = map (\x -> get1 x) l 
+allSecond :: DB -> [Int]
+allSecond l = map (\x -> get2 x) l
+allLast :: DB -> [[Int]]
+allLast l = map (\x -> get3 x) l
 
--- Return false if one of the students name is the same, even if the others are different. (and)
+-- Returns a list of Bools by comparing all elements in a list agains each other.
 difElem (x:xs) = (map (/= x) (xs))
--- sameElem (x:xs) = (map (== x) (xs))
 
 -- EXTENSION TO TASK 0
 {-
@@ -84,7 +87,7 @@ Given a database and a student id, we're looking for the list of
 courses of this particular student.
 -}
 query1 :: DB -> Int -> [Int]
-query1 db id = c where c = myFlatt ([get3 x | x <- db, get2 x == id])
+query1 db id = myFlatt ([get3 x | x <- db, get2 x == id])
 
 -- TASK 2
 {-
@@ -92,25 +95,45 @@ Given a database and a course, find all students
 taking this course.
 -}
 query2 :: DB -> Int -> [String]
-query2 db c = s where s = [get1 x | x <- db, cs <- get3 x, cs == c]
+query2 db c = [get1 x | x <- db, cs <- get3 x, cs == c]
 
 -- TASK 3
 {-
 Given a database, sort the database (in non-decreasing order)
 according to the name of students.
+
+Examples:
+http://learnyouahaskell.com/higher-order-functions
+Tutorial:
+http://learnyouahaskell.com/chapters
 -}
+
 sortDB :: DB -> DB
 sortDB [] = []
-sortDB gtThan (p:xs) = (quicksort gtThan lesser) ++ [p] ++ (quicksort gtThan greater)
-    where
-        ltEqThan = \x -> \y -> not (gtThan x y)
-        lesser = filter (gtThan p) xs
-        greater = filter (ltEqThan p) xs
+sortDB (x:xs) = sortDB lesser ++ [x] ++ sortDB greater
+  where lesser = filter (< x) (xs)
+        greater = filter (> x) (xs) 
+
+-- Testing purpose
+cons2 :: DB
+cons2 = [("a", 200, [341, 456]), ("c", 100, [100]), ("b", 50, [160, 456, 123])]
+
+x :: Student
+x = ("a", 200, [341, 456, 879])
+xs :: DB
+xs = [("c", 100, [100]), ("b", 50, [160, 456])]
 
 {-
 Extension1:
 Provide a function sortDB' which sorts the database according to the number of courses a student is taking
+-}
+sortDB2 :: DB -> DB
+sortDB2 [] = []
+sortDB2 (x:xs) = sortDB greater ++ [x] ++ sortDB lesser 
+  where greater = filter (\(_,_,cs) -> length cs < (length . get3) x) (xs)
+        lesser = filter (\(_,_,cs) -> length cs > (length . get3) x) (xs) 
 
+{-
 Extension2:
 Provide a function sortDB'' which is parameterized in the actual comparing relation which determines the sorting order
 For example:
@@ -122,9 +145,7 @@ For example:
 Then you can define
 
  sortDB = sortDB'' cmpName
-
 -}
-
 
 -- TASK 4
 {-
@@ -140,10 +161,19 @@ The last merge fails because Jane has been given two distinct
 student IDs.
 -}
 
-merge :: DB -> DB -> Maybe DB
-merge = error "Your code"
+-- Testing purpose]
+m1 :: DB
+m1 =  [("Jane", 112, [141, 353])] 
+m11 :: DB
+m11 = [("Jane", 112, [141, 252])]
 
+m2 :: DB
+m2 =  [("Jane", 112, [141, 353])] 
+m22 :: DB
+m22 = [("Jane", 113, [141, 252])]
 
+merge :: DB -> DB -> DB
+merge db1 db2 = [x | x <- db1, y <- db2, get2 x == get2 y]
 
 -- Utils
 myFlatt :: [[a]] -> [a]
