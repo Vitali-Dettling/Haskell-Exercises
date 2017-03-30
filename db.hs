@@ -147,6 +147,7 @@ Then you can define
  sortDB = sortDB'' cmpName
 -}
 
+
 -- TASK 4
 {-
 Given two databases, merge them to obtain one (consistent) database
@@ -163,7 +164,7 @@ student IDs.
 
 -- Testing purpose]
 m1 :: DB
-m1 =  [("Jane", 112, [141, 353])] 
+m1 =  [("Jane", 112, [141, 353]), ("Tim", 113, [141, 353])] 
 m11 :: DB
 m11 = [("Jane", 112, [141, 252])]
 
@@ -172,8 +173,11 @@ m2 =  [("Jane", 112, [141, 353])]
 m22 :: DB
 m22 = [("Jane", 113, [141, 252])]
 
-merge :: DB -> DB -> DB
-merge db1 db2 = [x | x <- db1, y <- db2, get2 x == get2 y]
+-- TODO: The function is not generic enough, because if db2 has more entries they will not be count!
+merge :: DB -> DB -> Maybe DB
+merge (x:xs) (y:ys)
+ | (\(_,mm1,_) -> \(_,mm2,_) -> mm1 == mm2) (x) (y) = Just (x : xs) 
+ | otherwise = Nothing
 
 -- Utils
 myFlatt :: [[a]] -> [a]
